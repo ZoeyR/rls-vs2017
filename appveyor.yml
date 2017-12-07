@@ -5,5 +5,5 @@ build_script:
   - msbuild .\RustLanguageExtension\RustLanguageExtension.csproj /p:configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:m
 
 artifacts:
-  - path: '*RustLanguageExtension.vsix'
+  - path: '**\*.vsix'
     name: RustLanguageExtension
