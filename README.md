@@ -1,6 +1,8 @@
 # Rust support for Visual Studio 2017 Preview
 
-[![Build status](https://ci.appveyor.com/api/projects/status/var20s6rdqf8bfv5/branch/master?svg=true)](https://ci.appveyor.com/project/dgriffen/whackwhackterminal/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/d2lxlincwninhsng?svg=true)](https://ci.appveyor.com/project/dgriffen/rls-vs2017)
+
+
 
 Adds language support for Rust to Visual Studio 2017. Supports:
 
