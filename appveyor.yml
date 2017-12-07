@@ -2,4 +2,8 @@ image: Visual Studio 2017
 
 build_script:
   - nuget restore -Verbosity quiet
-  - msbuild .\RustLanguageExtension\RustLanguageExtension.csproj /p:configuration=Debug /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:m
+  - msbuild .\RustLanguageExtension\RustLanguageExtension.csproj /p:configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:m
+
+  artifacts:
+  - path: '*RustLanguageExtension.vsix'
+    name: RustLanguageExtension
