@@ -36,7 +36,7 @@ namespace RustLanguageExtension
         public static void LoadData()
         {
             var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
-            var userSettingsStore = settingsManager.GetWritableSettingsStore(Microsoft.VisualStudio.Settings.SettingsScope.UserSettings);
+            var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 
             toolchain = userSettingsStore.GetString(SettingsCollection, ToolchainProperty);
@@ -45,7 +45,7 @@ namespace RustLanguageExtension
         public static void SaveData()
         {
             var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
-            var userSettingsStore = settingsManager.GetWritableSettingsStore(Microsoft.VisualStudio.Settings.SettingsScope.UserSettings);
+            var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 
             userSettingsStore.SetString(SettingsCollection, ToolchainProperty, toolchain);
