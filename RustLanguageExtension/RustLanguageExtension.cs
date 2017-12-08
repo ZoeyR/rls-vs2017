@@ -57,31 +57,57 @@ namespace RustLanguageExtension
             var toolchain = OptionsModel.Toolchain;
             if (!await Rustup.HasToolchain(toolchain))
             {
-                await VsUtilities.ShowInfoBar($"configured toolchain {toolchain} is not installed, please install and relaunch VS");
-                return;
+                var infoBar = new VsUtilities.InfoBar($"configured toolchain {toolchain} is not installed", new VsUtilities.InfoBarButton("Install"));
+                if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+                {
+                    await Rustup.InstallToolchain(toolchain);
+                }
+                else
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rls-preview", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rls-preview' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent(toolchain, "rls-preview"))
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rust-analysis", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rust-analysis' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent(toolchain, "rust-analysis"))
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rust-src", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rust-src' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent(toolchain, "rust-src"))
+                {
+                    return;
+                }
             }
 
             if (StartAsync != null)
             {
                 await StartAsync.InvokeAsync(this, EventArgs.Empty);
+            }
+        }
+
+        private async Task<bool> InstallComponent(string toolchain, string component)
+        {
+            var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+            {
+                return await Rustup.InstallComponent(toolchain, component) == 0;
+            }
+            else
+            {
+                return false;
             }
         }
 

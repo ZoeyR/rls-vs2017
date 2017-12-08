@@ -72,18 +72,18 @@ namespace RustLanguageExtension
             }
         }
 
-        public delegate void InfoBarEventHandler(object source);
+        public delegate void InfoBarEventHandler(object source, InfoBarEventArgs e);
         public class InfoBarButton : InfoBarActionItem
         {
             public event InfoBarEventHandler OnClick;
 
-            protected InfoBarButton(string text, object actionContext = null) : base(text, actionContext)
+            public InfoBarButton(string text, object actionContext = null) : base(text, actionContext)
             {
             }
 
-            public void Click()
+            public void Click(InfoBarEventArgs e)
             {
-                this.OnClick(this);
+                this.OnClick(this, e);
             }
 
             public override bool IsButton => true;
@@ -110,7 +110,7 @@ namespace RustLanguageExtension
             {
                 if (actionItem is InfoBarButton button)
                 {
-                    button.Click();
+                    button.Click(new InfoBarEventArgs(uiElement, infoBar));
                 }
             }
         }
