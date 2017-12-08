@@ -70,7 +70,7 @@ namespace RustLanguageExtension
 
             if (!await Rustup.HasComponent("rls-preview", toolchain))
             {
-                if (!await InstallComponent(toolchain, "rls-preview"))
+                if (!await InstallComponent("rls-preview", toolchain))
                 {
                     return;
                 }
@@ -78,7 +78,7 @@ namespace RustLanguageExtension
 
             if (!await Rustup.HasComponent("rust-analysis", toolchain))
             {
-                if (!await InstallComponent(toolchain, "rust-analysis"))
+                if (!await InstallComponent("rust-analysis", toolchain))
                 {
                     return;
                 }
@@ -86,7 +86,7 @@ namespace RustLanguageExtension
 
             if (!await Rustup.HasComponent("rust-src", toolchain))
             {
-                if (!await InstallComponent(toolchain, "rust-src"))
+                if (!await InstallComponent("rust-src", toolchain))
                 {
                     return;
                 }
@@ -98,12 +98,12 @@ namespace RustLanguageExtension
             }
         }
 
-        private async Task<bool> InstallComponent(string toolchain, string component)
+        private async Task<bool> InstallComponent(string component, string toolchain)
         {
             var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
             if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
             {
-                return await Rustup.InstallComponent(toolchain, component) == 0;
+                return await Rustup.InstallComponent(component, toolchain) == 0;
             }
             else
             {
