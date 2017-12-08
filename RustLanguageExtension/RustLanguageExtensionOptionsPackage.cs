@@ -60,23 +60,7 @@ namespace RustLanguageExtension
         /// </summary>
         protected override void Initialize()
         {
-            Instance = this;
             base.Initialize();
-        }
-
-        public static RustLanguageExtensionOptionsPackage Instance
-        {
-            get;
-            private set;
-        }
-
-        public string OptionToolchain
-        {
-            get
-            {
-                OptionsPage page = (OptionsPage)GetDialogPage(typeof(OptionsPage));
-                return page.Toolchain;
-            }
         }
 
         #endregion

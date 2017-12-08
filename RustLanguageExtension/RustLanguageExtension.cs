@@ -31,7 +31,7 @@ namespace RustLanguageExtension
 
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
-            var toolchain = RustLanguageExtensionOptionsPackage.Instance.OptionToolchain;
+            var toolchain = OptionsModel.Toolchain;
             var env = await MakeEnvironment(toolchain);
             var startInfo = new ProcessStartInfo()
             {
@@ -54,13 +54,7 @@ namespace RustLanguageExtension
 
         public async System.Threading.Tasks.Task OnLoadedAsync()
         {
-            // Since the extension is loaded via MEF the package with options is not guarenteed to be loaded yet.
-            // Load the package here so that options can be accessed.
-            IVsShell shell = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsShell)) as IVsShell;
-            Guid PackageToBeLoadedGuid = new Guid(RustLanguageExtensionOptionsPackage.PackageGuidString);
-            shell.LoadPackage(ref PackageToBeLoadedGuid, out var package);
-
-            var toolchain = RustLanguageExtensionOptionsPackage.Instance.OptionToolchain;
+            var toolchain = OptionsModel.Toolchain;
             if (!await Rustup.HasToolchain(toolchain))
             {
                 await VsUtilities.ShowInfoBar($"configured toolchain {toolchain} is not installed, please install and relaunch VS");
