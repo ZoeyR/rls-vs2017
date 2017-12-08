@@ -60,7 +60,12 @@ namespace RustLanguageExtension
                 var infoBar = new VsUtilities.InfoBar($"configured toolchain {toolchain} is not installed", new VsUtilities.InfoBarButton("Install"));
                 if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
                 {
-                    await Rustup.InstallToolchain(toolchain);
+                    var task = Rustup.InstallToolchain(toolchain).ContinueWith(t => t.Result == 0);
+                    await VsUtilities.CreateTask($"Installing {toolchain}", task);
+                    if (!await task)
+                    {
+                        return;
+                    }
                 }
                 else
                 {
@@ -103,7 +108,9 @@ namespace RustLanguageExtension
             var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
             if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
             {
-                return await Rustup.InstallComponent(component, toolchain) == 0;
+                var task = Rustup.InstallComponent(component, toolchain).ContinueWith(t => t.Result == 0);
+                await VsUtilities.CreateTask($"Installing {component}", task);
+                return await task;
             }
             else
             {

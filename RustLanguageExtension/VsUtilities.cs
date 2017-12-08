@@ -13,18 +13,18 @@ namespace RustLanguageExtension
 {
     public static class VsUtilities
     {
-        public static async Task<ITaskHandler> CreateTask(string title)
+        public static async System.Threading.Tasks.Task CreateTask<T>(string title, Task<T> task)
         {
             var tsc = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsTaskStatusCenterService)) as IVsTaskStatusCenterService;
 
             var options = default(TaskHandlerOptions);
             options.Title = title;
-            options.ActionsAfterCompletion = CompletionActions.RetainAndNotifyOnRanToCompletion;
 
             var data = default(TaskProgressData);
             data.PercentComplete = null;
 
-            return tsc.PreRegister(options, data);
+            var handler = tsc.PreRegister(options, data);
+            handler.RegisterTask(task);
         }
 
         public static async System.Threading.Tasks.Task ShowInfoBar(InfoBar infoBar)
