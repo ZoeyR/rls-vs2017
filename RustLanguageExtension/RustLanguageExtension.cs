@@ -57,31 +57,64 @@ namespace RustLanguageExtension
             var toolchain = OptionsModel.Toolchain;
             if (!await Rustup.HasToolchain(toolchain))
             {
-                await VsUtilities.ShowInfoBar($"configured toolchain {toolchain} is not installed, please install and relaunch VS");
-                return;
+                var infoBar = new VsUtilities.InfoBar($"configured toolchain {toolchain} is not installed", new VsUtilities.InfoBarButton("Install"));
+                if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+                {
+                    var task = Rustup.InstallToolchain(toolchain).ContinueWith(t => t.Result == 0);
+                    await VsUtilities.CreateTask($"Installing {toolchain}", task);
+                    if (!await task)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rls-preview", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rls-preview' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent("rls-preview", toolchain))
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rust-analysis", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rust-analysis' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent("rust-analysis", toolchain))
+                {
+                    return;
+                }
             }
 
             if (!await Rustup.HasComponent("rust-src", toolchain))
             {
-                await VsUtilities.ShowInfoBar($"component 'rust-src' is not installed, please install and relaunch VS");
-                return;
+                if (!await InstallComponent("rust-src", toolchain))
+                {
+                    return;
+                }
             }
 
             if (StartAsync != null)
             {
                 await StartAsync.InvokeAsync(this, EventArgs.Empty);
+            }
+        }
+
+        private async Task<bool> InstallComponent(string component, string toolchain)
+        {
+            var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+            {
+                var task = Rustup.InstallComponent(component, toolchain).ContinueWith(t => t.Result == 0);
+                await VsUtilities.CreateTask($"Installing {component}", task);
+                return await task;
+            }
+            else
+            {
+                return false;
             }
         }
 

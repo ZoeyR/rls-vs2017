@@ -66,6 +66,7 @@
     <Compile Include="RustLanguageExtension.cs" />
     <Compile Include="RustLanguageExtensionOptionsPackage.cs" />
     <Compile Include="Rustup.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="VsUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
