@@ -36,6 +36,10 @@ namespace RustLanguageExtension
             shell.GetProperty((int)__VSSPROPID7.VSSPROPID_MainWindowInfoBarHost, out var host);
             if (host is IVsInfoBarHost infoBarHost)
             {
+                var eventSink = new InfoBarEvents(infoBar, uiElement);
+                uiElement.Advise(eventSink, out var cookie);
+                eventSink.Cookie = cookie;
+
                 infoBarHost.AddInfoBar(uiElement);
             }
         }
@@ -95,9 +99,14 @@ namespace RustLanguageExtension
             private IVsInfoBarUIElement uiElement;
             private InfoBar infoBar;
 
-            public InfoBarEvents(InfoBar infoBar, uint cookie, IVsInfoBarUIElement uiElement)
+            public uint Cookie
             {
-                this.cookie = cookie;
+                set { this.cookie = value; }
+            }
+
+            public InfoBarEvents(InfoBar infoBar, IVsInfoBarUIElement uiElement)
+            {
+                this.infoBar = infoBar;
                 this.uiElement = uiElement;
             }
             public void OnClosed(IVsInfoBarUIElement infoBarUIElement)
