@@ -31,7 +31,7 @@ namespace RustLanguageExtension
 
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
-            var toolchain = RustLanguageExtensionOptionsPackage.Instance.OptionToolchain;
+            var toolchain = OptionsModel.Toolchain;
             var env = await MakeEnvironment(toolchain);
             var startInfo = new ProcessStartInfo()
             {
