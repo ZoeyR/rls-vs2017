@@ -2,7 +2,7 @@ image: Visual Studio 2017
 
 build_script:
   - nuget restore
-  - msbuild .\RustLanguageExtension\RustLanguageExtension.csproj /p:configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:diag
+  - msbuild .\RustLanguageExtension\RustLanguageExtension.csproj /p:configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:m
 
 artifacts:
   - path: '**\*.vsix'
