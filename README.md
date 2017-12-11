@@ -2,8 +2,6 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/d2lxlincwninhsng?svg=true)](https://ci.appveyor.com/project/dgriffen/rls-vs2017)
 
-
-
 Adds language support for Rust to Visual Studio 2017. Supports:
 
 - code completion
@@ -18,12 +16,9 @@ Please note that this extension is very early in development. At this time setup
 ## Quick Start
 
 - Install a preview build of Visual Studio
-- Install [rustup](https://www.rustup.rs/) (Rust toolchain manager).
-- Install rls-preview, rust-analysis, and rust-src
-    - `rustup component add rls-preview rust-analysis rust-src --toolchain {toolchain}`
-    - replace toolchain with the toolchain that you wish to use for the rls. Note that some toolchains may be missing the rls.
 - Install the preview LSP support from the [marketplace](https://marketplace.visualstudio.com/items?itemName=vsext.LanguageServerClientPreview)
-- Download and run the extension .vsix from the [releases](https://github.com/dgriffen/rls-vs2017/releases) page.
+- Install [rustup](https://www.rustup.rs/) (Rust toolchain manager).
+- Install this extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=DanielGriffen.Rust)
 - Go to the options for the extension (`Tools > Options > Rust`) and set the toolchain to the one you installed the components to.
 - Open a Rust project (`File > Open Folder...`). Open the folder for the whole project (i.e., the folder containing 'Cargo.toml'), not the 'src' folder.
-- The extension will start when you open a Rust file. You'll be notified if you are missing any 
+- The extension will start when you open a Rust file. You'll be prompted to install the RLS. Once installed, the RLS should start building your project.
