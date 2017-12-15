@@ -52,7 +52,9 @@ namespace RustLanguageExtension
 
         private void MenuItem_BeforeQueryStatus(object sender, EventArgs e)
         {
-            // TODO: check for 'Cargo.toml' and make visible
+            var menuItem = sender as MenuCommand;
+            menuItem.Visible = true;
+            menuItem.Enabled = true;
         }
 
         /// <summary>

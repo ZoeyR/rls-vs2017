@@ -23,6 +23,11 @@
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidRustLanguageExtensionOptionsPackage">
+    <Groups>
+      <Group guid="guidRustLanguageExtensionPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="anyCodeContextMenuGuid" id="anyCodeContextMenuID" />
+      </Group>
+    </Groups>
     <!-- Inside this section we have different sub-sections: one for the menus, another
     for the menu groups, one for the buttons (the actual commands), one for the combos
     and the last one for the bitmaps used. Each element is identified by a command id that
@@ -42,8 +47,8 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidRustLanguageExtensionOptionsPackageCmdSet" id="CargoPackageManagerCommandId" priority="0x0100" type="Button">
-        <Parent guid="anyCodeContextMenu" id="anyCodeContextMenuID"/>
+      <Button guid="guidRustLanguageExtensionPackageCmdSet" id="CargoPackageManagerCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidRustLanguageExtensionPackageCmdSet" id="MyMenuGroup"/>
         <Icon guid="ImageCatalogGuid" id="PatchPackage" />
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -57,17 +62,17 @@
   </Commands>
 
   <Symbols>
-    <GuidSymbol name="anyCodeContextMenu" value="{cfb400f1-5c60-4f3c-856e-180d28def0b7}">
+    <GuidSymbol name="anyCodeContextMenuGuid" value="{cfb400f1-5c60-4f3c-856e-180d28def0b7}">
       <IDSymbol name="anyCodeContextMenuID" value="0x0002"/>
     </GuidSymbol>
     <!-- This is the package guid. -->
     <GuidSymbol name="guidRustLanguageExtensionOptionsPackage" value="{b57536cb-0310-4e50-907b-a14610127c49}" />
 
-    <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidRustLanguageExtensionOptionsPackageCmdSet" value="{65ada370-37fe-4e01-bd37-be2d70a3dff6}">
+    <GuidSymbol name="guidRustLanguageExtensionPackageCmdSet" value="{65ada370-37fe-4e01-bd37-be2d70a3dff6}" >
+      <IDSymbol name="MyMenuGroup" value="4128" />
       <IDSymbol name="CargoPackageManagerCommandId" value="0x0100" />
     </GuidSymbol>
-
+    
     <GuidSymbol name="guidImages" value="{727557b5-37ca-40ff-8bb4-9896bc451af2}" >
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
