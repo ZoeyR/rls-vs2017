@@ -26,6 +26,8 @@ namespace RustLanguageExtension
 
         public IEnumerable<string> FilesToWatch => null;
 
+        public bool Active { get; private set; }
+
         public event AsyncEventHandler<EventArgs> StartAsync;
         public event AsyncEventHandler<EventArgs> StopAsync;
 
@@ -49,11 +51,13 @@ namespace RustLanguageExtension
             }
 
             var p = Process.Start(startInfo);
+            this.Active = true;
             return new Connection(p.StandardOutput.BaseStream, p.StandardInput.BaseStream);
         }
 
         public async System.Threading.Tasks.Task OnLoadedAsync()
         {
+            await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("extension has begun launching", new VsUtilities.InfoBarButton("Continue")));
             var toolchain = OptionsModel.Toolchain;
             if (!await Rustup.HasToolchain(toolchain))
             {
@@ -77,7 +81,7 @@ namespace RustLanguageExtension
             {
                 if (!await InstallComponent("rls-preview", toolchain))
                 {
-                    return;
+                    await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("rls-preview not correctly installed", new VsUtilities.InfoBarButton("Continue")));
                 }
             }
 
@@ -85,7 +89,7 @@ namespace RustLanguageExtension
             {
                 if (!await InstallComponent("rust-analysis", toolchain))
                 {
-                    return;
+                    await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("rust-analysis not correctly installed", new VsUtilities.InfoBarButton("Continue")));
                 }
             }
 
@@ -93,13 +97,16 @@ namespace RustLanguageExtension
             {
                 if (!await InstallComponent("rust-src", toolchain))
                 {
-                    return;
+                    await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("rust-src not correctly installed", new VsUtilities.InfoBarButton("Continue")));
                 }
             }
 
             if (StartAsync != null)
             {
                 await StartAsync.InvokeAsync(this, EventArgs.Empty);
+            } else
+            {
+                await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("bug in the LSP extension", new VsUtilities.InfoBarButton("Continue")));
             }
         }
 
