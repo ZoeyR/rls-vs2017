@@ -16,7 +16,7 @@ namespace RustLanguageExtension
 {
     [Export(typeof(ILanguageClient))]
     [ContentType("rust")]
-    public class RustLanguageExtension : ILanguageClient
+    public class RustLanguageClient : ILanguageClient
     {
         public string Name => "Rust Language Extension";
 
