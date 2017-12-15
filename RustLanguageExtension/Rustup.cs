@@ -15,36 +15,36 @@ namespace RustLanguageExtension
             return RunCommand("update");
         }
 
-        public static Task<(string output, int exitCode)> Run(string command, string toolchain)
+        public static Task<Tuple<string, int>> Run(string command, string toolchain)
         {
             return RunCommand($"run {toolchain} command");
         }
 
         public static async Task<bool> HasToolchain(string toolchain)
         {
-            var (output, _) = await RunCommand("toolchain list");
-            return output.Contains(toolchain);
+            var t = await RunCommand("toolchain list");
+            return t.Item1.Contains(toolchain);
         }
 
         public static async Task<bool> HasComponent(string component, string toolchain)
         {
-            var (output, _) = await RunCommand($"component list --toolchain {toolchain}");
-            return Regex.IsMatch(output, $"^{component}.* \\((default|installed)\\)$", RegexOptions.Multiline);
+            var t = await RunCommand($"component list --toolchain {toolchain}");
+            return Regex.IsMatch(t.Item1, $"^{component}.* \\((default|installed)\\)$", RegexOptions.Multiline);
         }
 
         public static async Task<int> InstallToolchain(string toolchain)
         {
-            var (_, exitCode) = await RunCommand($"toolchain install {toolchain}");
-            return exitCode;
+            var t = await RunCommand($"toolchain install {toolchain}");
+            return t.Item2;
         }
 
         public static async Task<int> InstallComponent(string component, string toolchain)
         {
-            var (_, exitCode) = await RunCommand($"component add {component} --toolchain {toolchain}");
-            return exitCode;
+            var t = await RunCommand($"component add {component} --toolchain {toolchain}");
+            return t.Item2;
         }
 
-        private static async Task<(string output, int exitCode)> RunCommand(string command)
+        private static async Task<Tuple<string, int>> RunCommand(string command)
         {
             var startInfo = new ProcessStartInfo()
             {
@@ -60,7 +60,7 @@ namespace RustLanguageExtension
 
             var p = Process.Start(startInfo);
             var output = await p.StandardOutput.ReadToEndAsync();
-            return (output, p.ExitCode);
+            return new Tuple<string, int>(output, p.ExitCode);
         }
     }
 }

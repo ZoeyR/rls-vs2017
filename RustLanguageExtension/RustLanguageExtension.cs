@@ -141,8 +141,8 @@ namespace RustLanguageExtension
 
         private async Task<string> GetSysRoot(string toolchain)
         {
-            var (sysRoot, _) = await Rustup.Run("rustc --print sysroot", toolchain);
-            return sysRoot.Replace("\n", "").Replace("\r", "");
+            var t = await Rustup.Run("rustc --print sysroot", toolchain);
+            return t.Item1.Replace("\n", "").Replace("\r", "");
         }
     }
 }
