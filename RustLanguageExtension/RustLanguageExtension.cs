@@ -33,6 +33,7 @@ namespace RustLanguageExtension
 
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
+            Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("lanching rustup", new VsUtilities.InfoBarButton("Continue")));
             var toolchain = OptionsModel.Toolchain;
             var env = await MakeEnvironment(toolchain);
             var startInfo = new ProcessStartInfo()
@@ -52,6 +53,7 @@ namespace RustLanguageExtension
 
             var p = Process.Start(startInfo);
             this.Active = true;
+            Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("handing control to lsp", new VsUtilities.InfoBarButton("Continue")));
             return new Connection(p.StandardOutput.BaseStream, p.StandardInput.BaseStream);
         }
 
@@ -103,6 +105,7 @@ namespace RustLanguageExtension
 
             if (StartAsync != null)
             {
+                await Utilities.WaitForSingleButtonInfoBarAsync(new VsUtilities.InfoBar("activating the LSP", new VsUtilities.InfoBarButton("Continue")));
                 await StartAsync.InvokeAsync(this, EventArgs.Empty);
             } else
             {
