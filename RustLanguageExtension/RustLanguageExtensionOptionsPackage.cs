@@ -34,6 +34,8 @@ namespace RustLanguageExtension
     [Guid(RustLanguageExtensionOptionsPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideOptionPage(typeof(OptionsPage), "Rust", "Language Server", 0, 0, true)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(RustLanguageExtension.CargoPackageManager.CargoPackageManager))]
     public sealed class RustLanguageExtensionOptionsPackage : Package
     {
         /// <summary>
@@ -61,6 +63,7 @@ namespace RustLanguageExtension
         protected override void Initialize()
         {
             base.Initialize();
+            RustLanguageExtension.CargoPackageManager.CargoPackageManagerCommand.Initialize(this);
         }
 
         #endregion
