@@ -22,7 +22,7 @@
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidRustLanguageExtensionOptionsPackage">
+  <Commands package="guidRustLanguageExtensionPackage">
     <Groups>
       <Group guid="guidRustLanguageExtensionPackageCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="anyCodeContextMenuGuid" id="anyCodeContextMenuID" />
@@ -66,7 +66,7 @@
       <IDSymbol name="anyCodeContextMenuID" value="0x0002"/>
     </GuidSymbol>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidRustLanguageExtensionOptionsPackage" value="{b57536cb-0310-4e50-907b-a14610127c49}" />
+    <GuidSymbol name="guidRustLanguageExtensionPackage" value="{b57536cb-0310-4e50-907b-a14610127c49}" />
 
     <GuidSymbol name="guidRustLanguageExtensionPackageCmdSet" value="{65ada370-37fe-4e01-bd37-be2d70a3dff6}" >
       <IDSymbol name="MyMenuGroup" value="4128" />

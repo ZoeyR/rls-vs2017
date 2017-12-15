@@ -67,10 +67,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RustContentDefinition.cs" />
-    <Compile Include="RustLanguageClient.cs" />
+    <Compile Include="LanguageClient\RustContentDefinition.cs" />
+    <Compile Include="LanguageClient\RustLanguageClient.cs" />
     <Compile Include="RustLanguageExtensionPackage.cs" />
-    <Compile Include="Rustup.cs" />
+    <Compile Include="LanguageClient\Rustup.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="VsUtilities.cs" />
   </ItemGroup>
