@@ -3,8 +3,9 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
 
-namespace RustLanguageExtension.CargoPackageManager
+namespace RustLanguageExtension
 {
     /// <summary>
     /// Command handler
@@ -24,14 +25,14 @@ namespace RustLanguageExtension.CargoPackageManager
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly Package package;
+        private readonly AsyncPackage package;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CargoPackageManagerCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        private CargoPackageManagerCommand(Package package)
+        private CargoPackageManagerCommand(AsyncPackage package, OleMenuCommandService commandService)
         {
             if (package == null)
             {
@@ -40,13 +41,18 @@ namespace RustLanguageExtension.CargoPackageManager
 
             this.package = package;
 
-            OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(this.ShowToolWindow, menuCommandID);
+                var menuItem = new OleMenuCommand(this.ShowToolWindow, menuCommandID);
+                menuItem.BeforeQueryStatus += MenuItem_BeforeQueryStatus;
                 commandService.AddCommand(menuItem);
             }
+        }
+
+        private void MenuItem_BeforeQueryStatus(object sender, EventArgs e)
+        {
+            // TODO: check for 'Cargo.toml' and make visible
         }
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace RustLanguageExtension.CargoPackageManager
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private IServiceProvider ServiceProvider
+        private Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider ServiceProvider
         {
             get
             {
@@ -73,9 +79,11 @@ namespace RustLanguageExtension.CargoPackageManager
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static void Initialize(Package package)
+        public static async System.Threading.Tasks.Task InitializeAsync(AsyncPackage package)
         {
-            Instance = new CargoPackageManagerCommand(package);
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            Instance = new CargoPackageManagerCommand(package, commandService);
         }
 
         /// <summary>

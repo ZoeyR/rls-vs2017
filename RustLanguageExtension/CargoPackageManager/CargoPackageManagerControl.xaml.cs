@@ -1,4 +1,4 @@
-﻿namespace RustLanguageExtension.CargoPackageManager
+﻿namespace RustLanguageExtension
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;

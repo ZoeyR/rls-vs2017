@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -29,14 +30,15 @@ namespace RustLanguageExtension
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
-    [Guid(RustLanguageExtensionOptionsPackage.PackageGuidString)]
+    [Guid(RustLanguageExtensionPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideOptionPage(typeof(OptionsPage), "Rust", "Language Server", 0, 0, true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(RustLanguageExtension.CargoPackageManager.CargoPackageManager))]
-    public sealed class RustLanguageExtensionOptionsPackage : Package
+    [ProvideToolWindow(typeof(CargoPackageManager))]
+    [ProvideAutoLoad("4646B819-1AE0-4E79-97F4-8A8176FDD664", PackageAutoLoadFlags.BackgroundLoad)]
+    public sealed class RustLanguageExtensionPackage : AsyncPackage
     {
         /// <summary>
         /// RustLanguageExtensionOptionsPackage GUID string.
@@ -44,9 +46,9 @@ namespace RustLanguageExtension
         public const string PackageGuidString = "b57536cb-0310-4e50-907b-a14610127c49";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RustLanguageExtensionOptionsPackage"/> class.
+        /// Initializes a new instance of the <see cref="RustLanguageExtensionPackage"/> class.
         /// </summary>
-        public RustLanguageExtensionOptionsPackage()
+        public RustLanguageExtensionPackage()
         {
             // Inside this method you can place any initialization code that does not require
             // any Visual Studio service because at this point the package object is created but
@@ -60,10 +62,10 @@ namespace RustLanguageExtension
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
-            RustLanguageExtension.CargoPackageManager.CargoPackageManagerCommand.Initialize(this);
+            await base.InitializeAsync(cancellationToken, progress);
+            await CargoPackageManagerCommand.InitializeAsync(this);
         }
 
         #endregion
