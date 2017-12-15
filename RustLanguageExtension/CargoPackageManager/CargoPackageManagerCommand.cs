@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
@@ -52,9 +53,30 @@ namespace RustLanguageExtension
 
         private void MenuItem_BeforeQueryStatus(object sender, EventArgs e)
         {
-            var menuItem = sender as MenuCommand;
-            menuItem.Visible = true;
-            menuItem.Enabled = true;
+            var menuItem = (MenuCommand)sender;
+            var monitorSelection = package.GetServiceAsync(typeof(SVsShellMonitorSelection)).Result as IVsMonitorSelection;
+            monitorSelection.GetCurrentSelection(out var hierarchyPtr, out var itemId, out var multiItemSelect, out var selectionContainer);
+
+            if (selectionContainer != IntPtr.Zero)
+            {
+                Marshal.Release(selectionContainer);
+            }
+
+            if (hierarchyPtr != IntPtr.Zero)
+            {
+                IVsHierarchy hierarchy = (IVsHierarchy)Marshal.GetObjectForIUnknown(hierarchyPtr);
+                hierarchy.GetCanonicalName(itemId, out var name);
+
+                if (name.EndsWith("Cargo.toml", StringComparison.OrdinalIgnoreCase))
+                {
+                    menuItem.Visible = true;
+                    menuItem.Enabled = true;
+                    return;
+                }
+            }
+
+            menuItem.Visible = false;
+            menuItem.Enabled = false;
         }
 
         /// <summary>
