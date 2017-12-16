@@ -18,6 +18,14 @@ namespace RustLanguageExtension
             set { OptionsModel.Toolchain = value; }
         }
 
+        [DisplayName("Path to rustup")]
+        [Description("Path to the rustup binary, including rustup.exe")]
+        public string RustupPath
+        {
+            get { return OptionsModel.RustupPath; }
+            set { OptionsModel.RustupPath = value; }
+        }
+
         public override void LoadSettingsFromStorage()
         {
             OptionsModel.LoadData();
