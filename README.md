@@ -8,6 +8,8 @@ Adds language support for Rust to Visual Studio 2017. Supports:
 - goto definition
 - find all references
 - error squiggles
+- code action (lightbulb)
+- rename
 
 Rust support is powered by the [Rust Language Server](https://github.com/rust-lang-nursery/rls) (RLS). Language server support was recently added experimentally to Visual Studio, and is only available on preview builds of VS.
 
