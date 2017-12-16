@@ -54,6 +54,13 @@ namespace RustLanguageExtension
 
         public async System.Threading.Tasks.Task OnLoadedAsync()
         {
+            if(!Rustup.IsInstalled())
+            {
+                var infoBar = new VsUtilities.InfoBar("could not start the rls: rustup is not installed or not on the path");
+                await VsUtilities.ShowInfoBar(infoBar);
+                return;
+            }
+
             var toolchain = OptionsModel.Toolchain;
             if (!await Rustup.HasToolchain(toolchain))
             {
@@ -73,26 +80,15 @@ namespace RustLanguageExtension
                 }
             }
 
-            if (!await Rustup.HasComponent("rls-preview", toolchain))
+            // Check for necessary rls components
+            if (!await Rustup.HasComponent("rls-preview", toolchain)
+                || !await Rustup.HasComponent("rust-analysis", toolchain)
+                || !await Rustup.HasComponent("rust-src", toolchain))
             {
-                if (!await InstallComponent("rls-preview", toolchain))
+                if (!await InstallComponents(toolchain, "rls-preview", "rust-analysis", "rust-src"))
                 {
-                    return;
-                }
-            }
-
-            if (!await Rustup.HasComponent("rust-analysis", toolchain))
-            {
-                if (!await InstallComponent("rust-analysis", toolchain))
-                {
-                    return;
-                }
-            }
-
-            if (!await Rustup.HasComponent("rust-src", toolchain))
-            {
-                if (!await InstallComponent("rust-src", toolchain))
-                {
+                    var infoBar = new VsUtilities.InfoBar("could not install one of the required rls components");
+                    await VsUtilities.ShowInfoBar(infoBar);
                     return;
                 }
             }
@@ -103,13 +99,21 @@ namespace RustLanguageExtension
             }
         }
 
-        private async Task<bool> InstallComponent(string component, string toolchain)
+        private async Task<bool> InstallComponents(string toolchain, params string[] components)
         {
-            var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            VsUtilities.InfoBar infoBar;
+            if (components.Length == 1)
+            {
+                infoBar = new VsUtilities.InfoBar($"component '{components[0]}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            } else
+            {
+                infoBar = new VsUtilities.InfoBar("required components are not installed", new VsUtilities.InfoBarButton("Install"));
+            }
+
             if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
             {
-                var task = Rustup.InstallComponent(component, toolchain).ContinueWith(t => t.Result == 0);
-                await VsUtilities.CreateTask($"Installing {component}", task);
+                var task = Rustup.InstallComponents(toolchain, components).ContinueWith(t => t.Result == 0);
+                await VsUtilities.CreateTask($"Installing components", task);
                 return await task;
             }
             else

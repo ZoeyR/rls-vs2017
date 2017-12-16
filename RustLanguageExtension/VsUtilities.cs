@@ -27,6 +27,12 @@ namespace RustLanguageExtension
             handler.RegisterTask(task);
         }
 
+        public static async System.Threading.Tasks.Task ShowNotofication(string notification)
+        {
+            var infoBar = new VsUtilities.InfoBar(notification);
+            await VsUtilities.ShowInfoBar(infoBar);
+        }
+
         public static async System.Threading.Tasks.Task ShowInfoBar(InfoBar infoBar)
         {
             IVsInfoBarUIFactory infoBarUIFactory = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsInfoBarUIFactory)) as IVsInfoBarUIFactory;
@@ -72,7 +78,10 @@ namespace RustLanguageExtension
 
             public void Close()
             {
-                this.OnClosed();
+                if (this.OnClosed != null)
+                {
+                    this.OnClosed();
+                }
             }
         }
 
@@ -87,7 +96,10 @@ namespace RustLanguageExtension
 
             public void Click(InfoBarEventArgs e)
             {
-                this.OnClick(this, e);
+                if (this.OnClick != null)
+                {
+                    this.OnClick(this, e);
+                }
             }
 
             public override bool IsButton => true;

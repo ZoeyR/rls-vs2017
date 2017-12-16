@@ -10,6 +10,18 @@ namespace RustLanguageExtension
 {
     public static class Rustup
     {
+        public static bool IsInstalled()
+        {
+            try
+            {
+                Process.Start("rustup");
+                return true;
+            } catch (Exception e)
+            {
+                return false;
+            }
+        }
+
         public static Task Update()
         {
             return RunCommand("update");
@@ -38,9 +50,10 @@ namespace RustLanguageExtension
             return exitCode;
         }
 
-        public static async Task<int> InstallComponent(string component, string toolchain)
+        public static async Task<int> InstallComponents(string toolchain, params string[] components)
         {
-            var (_, exitCode) = await RunCommand($"component add {component} --toolchain {toolchain}");
+            var componentsString = string.Join(" ", components);
+            var (_, exitCode) = await RunCommand($"component add {componentsString} --toolchain {toolchain}");
             return exitCode;
         }
 
