@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -29,7 +30,12 @@ namespace RustLanguageExtension
             {
                 var (_, exitCode) = await this.RunCommand("toolchain list");
                 return exitCode == 0;
-            } catch (Win32Exception)
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+            catch (FileNotFoundException)
             {
                 return false;
             }
