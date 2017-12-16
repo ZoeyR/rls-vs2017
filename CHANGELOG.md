@@ -30,6 +30,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - support for toolchains other than the default nightly
 - error notifications
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.1.2...HEAD
-[0.1.1]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.1-announce...v0.1.1
-[0.1.2]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.1.1...v0.1.2
+[Unreleased]: https://github.com/dgriffen/rls-vs2017/compare/v0.1.2...HEAD
+[0.1.1]: https://github.com/dgriffen/rls-vs2017/compare/v0.1-announce...v0.1.1
+[0.1.2]: https://github.com/dgriffen/rls-vs2017/compare/v0.1.1...v0.1.2
