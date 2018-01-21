@@ -14,11 +14,15 @@ namespace RustLanguageExtension
         [Export]
         [Name("rust")]
         [BaseDefinition(CodeRemoteContentDefinition.CodeRemoteContentTypeName)]
+#pragma warning disable CS0649
         internal static ContentTypeDefinition RustContentTypeDefinition;
+#pragma warning restore CS0649
 
         [Export]
         [FileExtension(".rs")]
         [ContentType("rust")]
+#pragma warning disable CS0649
         internal static FileExtensionToContentTypeDefinition RustFileExtensionDefinition;
+#pragma warning restore CS0649
     }
 }

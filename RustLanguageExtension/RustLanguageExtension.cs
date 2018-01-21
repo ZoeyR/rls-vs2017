@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
+using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
 
 namespace RustLanguageExtension
 {
@@ -30,6 +31,14 @@ namespace RustLanguageExtension
         public event AsyncEventHandler<EventArgs> StartAsync;
         public event AsyncEventHandler<EventArgs> StopAsync;
 
+        private readonly IVsFolderWorkspaceService workspaceService;
+
+        [ImportingConstructor]
+        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService)
+        {
+            this.workspaceService = workspaceService;
+        }
+
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
             var path = OptionsModel.RustupPath == string.Empty ? "rustup" : OptionsModel.RustupPath;
@@ -37,6 +46,7 @@ namespace RustLanguageExtension
             var toolchain = OptionsModel.Toolchain;
             var env = await MakeEnvironment(rustup, toolchain);
 
+            var directoryPath = this.workspaceService.CurrentWorkspace?.Location ?? string.Empty;
             var startInfo = new ProcessStartInfo()
             {
                 FileName = path,
@@ -45,6 +55,7 @@ namespace RustLanguageExtension
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
+                WorkingDirectory = directoryPath,
             };
 
             foreach (var pair in env)
