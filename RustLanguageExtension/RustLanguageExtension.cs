@@ -2,17 +2,15 @@
 using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
 using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
+using Task = System.Threading.Tasks.Task;
 
 namespace RustLanguageExtension
 {
@@ -155,6 +153,16 @@ namespace RustLanguageExtension
         {
             var (sysRoot, _) = await rustup.Run("rustc --print sysroot", toolchain);
             return sysRoot.Replace("\n", "").Replace("\r", "");
+        }
+
+        public Task OnServerInitializedAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task OnServerInitializeFailedAsync(Exception e)
+        {
+            return Task.CompletedTask;
         }
     }
 }
