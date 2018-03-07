@@ -2,15 +2,15 @@
 using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Utilities;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using System.IO;
+using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
+using Task = System.Threading.Tasks.Task;
 
 namespace RustLanguageExtension
 {
@@ -29,18 +29,31 @@ namespace RustLanguageExtension
         public event AsyncEventHandler<EventArgs> StartAsync;
         public event AsyncEventHandler<EventArgs> StopAsync;
 
+        private readonly IVsFolderWorkspaceService workspaceService;
+
+        [ImportingConstructor]
+        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService)
+        {
+            this.workspaceService = workspaceService;
+        }
+
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
+            var path = OptionsModel.RustupPath == string.Empty ? "rustup" : OptionsModel.RustupPath;
+            var rustup = new Rustup(path);
             var toolchain = OptionsModel.Toolchain;
-            var env = await MakeEnvironment(toolchain);
+            var env = await MakeEnvironment(rustup, toolchain);
+
+            var directoryPath = this.workspaceService.CurrentWorkspace?.Location ?? string.Empty;
             var startInfo = new ProcessStartInfo()
             {
-                FileName = "rustup",
+                FileName = path,
                 Arguments = $"run {toolchain} rls",
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
+                WorkingDirectory = directoryPath,
             };
 
             foreach (var pair in env)
@@ -54,13 +67,21 @@ namespace RustLanguageExtension
 
         public async System.Threading.Tasks.Task OnLoadedAsync()
         {
+            var rustup = new Rustup(OptionsModel.RustupPath);
+            if(!await rustup.IsInstalled())
+            {
+                var infoBar = new VsUtilities.InfoBar("could not start the rls: rustup is not installed or not on the path");
+                await VsUtilities.ShowInfoBar(infoBar);
+                return;
+            }
+
             var toolchain = OptionsModel.Toolchain;
-            if (!await Rustup.HasToolchain(toolchain))
+            if (!await rustup.HasToolchain(toolchain))
             {
                 var infoBar = new VsUtilities.InfoBar($"configured toolchain {toolchain} is not installed", new VsUtilities.InfoBarButton("Install"));
                 if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
                 {
-                    var task = Rustup.InstallToolchain(toolchain).ContinueWith(t => t.Result == 0);
+                    var task = rustup.InstallToolchain(toolchain).ContinueWith(t => t.Result == 0);
                     await VsUtilities.CreateTask($"Installing {toolchain}", task);
                     if (!await task)
                     {
@@ -73,26 +94,15 @@ namespace RustLanguageExtension
                 }
             }
 
-            if (!await Rustup.HasComponent("rls-preview", toolchain))
+            // Check for necessary rls components
+            if (!await rustup.HasComponent("rls-preview", toolchain)
+                || !await rustup.HasComponent("rust-analysis", toolchain)
+                || !await rustup.HasComponent("rust-src", toolchain))
             {
-                if (!await InstallComponent("rls-preview", toolchain))
+                if (!await InstallComponents(rustup, toolchain, "rls-preview", "rust-analysis", "rust-src"))
                 {
-                    return;
-                }
-            }
-
-            if (!await Rustup.HasComponent("rust-analysis", toolchain))
-            {
-                if (!await InstallComponent("rust-analysis", toolchain))
-                {
-                    return;
-                }
-            }
-
-            if (!await Rustup.HasComponent("rust-src", toolchain))
-            {
-                if (!await InstallComponent("rust-src", toolchain))
-                {
+                    var infoBar = new VsUtilities.InfoBar("could not install one of the required rls components");
+                    await VsUtilities.ShowInfoBar(infoBar);
                     return;
                 }
             }
@@ -103,13 +113,21 @@ namespace RustLanguageExtension
             }
         }
 
-        private async Task<bool> InstallComponent(string component, string toolchain)
+        private async Task<bool> InstallComponents(Rustup rustup, string toolchain, params string[] components)
         {
-            var infoBar = new VsUtilities.InfoBar($"component '{component}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            VsUtilities.InfoBar infoBar;
+            if (components.Length == 1)
+            {
+                infoBar = new VsUtilities.InfoBar($"component '{components[0]}' is not installed", new VsUtilities.InfoBarButton("Install"));
+            } else
+            {
+                infoBar = new VsUtilities.InfoBar("required components are not installed", new VsUtilities.InfoBarButton("Install"));
+            }
+
             if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
             {
-                var task = Rustup.InstallComponent(component, toolchain).ContinueWith(t => t.Result == 0);
-                await VsUtilities.CreateTask($"Installing {component}", task);
+                var task = rustup.InstallComponents(toolchain, components).ContinueWith(t => t.Result == 0);
+                await VsUtilities.CreateTask($"Installing components", task);
                 return await task;
             }
             else
@@ -118,21 +136,33 @@ namespace RustLanguageExtension
             }
         }
 
-        private async Task<IDictionary<string, string>> MakeEnvironment(string toolchain)
+        private async Task<IDictionary<string, string>> MakeEnvironment(Rustup rustup, string toolchain)
         {
             var newEnv = new Dictionary<string, string>();
             if (Environment.GetEnvironmentVariable("RUST_SRC_PATH") == null)
             {
-                newEnv["RUST_SRC_PATH"] = await GetSysRoot(toolchain);
+                var sysRoot = await GetSysRoot(rustup, toolchain);
+                var srcPath = Path.Combine(sysRoot, "lib\\rustlib\\src\\rust\\src");
+                newEnv["RUST_SRC_PATH"] = srcPath;
             }
 
             return newEnv;
         }
 
-        private async Task<string> GetSysRoot(string toolchain)
+        private async Task<string> GetSysRoot(Rustup rustup, string toolchain)
         {
-            var (sysRoot, _) = await Rustup.Run("rustc --print sysroot", toolchain);
+            var (sysRoot, _) = await rustup.Run("rustc --print sysroot", toolchain);
             return sysRoot.Replace("\n", "").Replace("\r", "");
+        }
+
+        public Task OnServerInitializedAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task OnServerInitializeFailedAsync(Exception e)
+        {
+            return Task.CompletedTask;
         }
     }
 }

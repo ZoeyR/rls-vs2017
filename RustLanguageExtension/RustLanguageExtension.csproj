@@ -80,6 +80,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <SuppressFromVsix Include="Microsoft.VisualStudio.Workspace.dll">
+      <InProject>false</InProject>
+    </SuppressFromVsix>
+    <SuppressFromVsix Include="Microsoft.VisualStudio.Workspace.Extensions.dll">
+      <InProject>false</InProject>
+    </SuppressFromVsix>
+    <SuppressFromVsix Include="Microsoft.VisualStudio.Workspace.Extensions.VS.dll">
+      <InProject>false</InProject>
+    </SuppressFromVsix>
+    <SuppressFromVsix Include="Microsoft.VisualStudio.Workspace.VSIntegration.Contracts.dll">
+      <InProject>false</InProject>
+    </SuppressFromVsix>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -114,10 +128,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.LanguageServer.Client.Preview, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.VisualStudio.LanguageServer.Client.1.0.60-pre\lib\net461\Microsoft.VisualStudio.LanguageServer.Client.Preview.dll</HintPath>
+      <HintPath>..\packages\Microsoft.VisualStudio.LanguageServer.Client.1.1.6-pre\lib\net461\Microsoft.VisualStudio.LanguageServer.Client.Preview.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.LanguageServer.Protocol.Preview, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.VisualStudio.LanguageServer.Protocol.1.0.60-pre\lib\net461\Microsoft.VisualStudio.LanguageServer.Protocol.Preview.dll</HintPath>
+      <HintPath>..\packages\Microsoft.VisualStudio.LanguageServer.Protocol.1.1.6-pre\lib\net461\Microsoft.VisualStudio.LanguageServer.Protocol.Preview.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6070\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
@@ -187,9 +201,24 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Validation.15.3.15\lib\net45\Microsoft.VisualStudio.Validation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.Workspace, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Workspace.15.0.401\lib\net46\Microsoft.VisualStudio.Workspace.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Workspace.15.0.401\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.Extensions.VS, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Workspace.15.0.401\lib\net46\Microsoft.VisualStudio.Workspace.Extensions.VS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Workspace.VSIntegration.Contracts, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.VisualStudio.Workspace.VSIntegration.15.0.401\lib\net46\Microsoft.VisualStudio.Workspace.VSIntegration.Contracts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
