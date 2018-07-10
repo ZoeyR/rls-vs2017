@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Shell;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace RustLanguageExtension
     {
         public static async Task<bool> WaitForSingleButtonInfoBarAsync(InfoBar infoBar)
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (infoBar.ActionItems.Count != 1)
             {
                 throw new ArgumentException($"{nameof(infoBar)} has more than one button element");
@@ -18,9 +20,10 @@ namespace RustLanguageExtension
 
             var completionSource = new TaskCompletionSource<bool>();
 
-            var button = (InfoBarButton)infoBar.ActionItems.GetItem(0);
+            var button = (VsUtilities.InfoBarButton)infoBar.ActionItems.GetItem(0);
             button.OnClick += (source, e) =>
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
                 completionSource.SetResult(true);
                 e.InfoBarUIElement.Close();
             };
@@ -30,7 +33,7 @@ namespace RustLanguageExtension
                 completionSource.TrySetResult(false);
             };
 
-            await VsUtilities.ShowInfoBar(infoBar);
+            await VsUtilities.ShowInfoBarAsync(infoBar);
             return await completionSource.Task;
         }
     }
