@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TaskStatusCenter;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace RustLanguageExtension
 {
     public static class VsUtilities
     {
-        public static async System.Threading.Tasks.Task CreateTask<T>(string title, Task<T> task)
+        public static async System.Threading.Tasks.Task CreateTaskAsync<T>(string title, Task<T> task)
         {
             var tsc = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsTaskStatusCenterService)) as IVsTaskStatusCenterService;
 
@@ -27,14 +28,15 @@ namespace RustLanguageExtension
             handler.RegisterTask(task);
         }
 
-        public static async System.Threading.Tasks.Task ShowNotofication(string notification)
+        public static async System.Threading.Tasks.Task ShowNotoficationAsync(string notification)
         {
             var infoBar = new VsUtilities.InfoBar(notification);
-            await VsUtilities.ShowInfoBar(infoBar);
+            await VsUtilities.ShowInfoBarAsync(infoBar);
         }
 
-        public static async System.Threading.Tasks.Task ShowInfoBar(InfoBar infoBar)
+        public static async System.Threading.Tasks.Task ShowInfoBarAsync(InfoBar infoBar)
         {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             IVsInfoBarUIFactory infoBarUIFactory = await ServiceProvider.GetGlobalServiceAsync(typeof(SVsInfoBarUIFactory)) as IVsInfoBarUIFactory;
             var uiElement = infoBarUIFactory.CreateInfoBar(infoBar);
 
@@ -123,6 +125,8 @@ namespace RustLanguageExtension
             }
             public void OnClosed(IVsInfoBarUIElement infoBarUIElement)
             {
+                ThreadHelper.ThrowIfNotOnUIThread();
+
                 this.infoBar.Close();
                 uiElement.Unadvise(this.cookie);
             }
