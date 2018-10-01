@@ -28,8 +28,8 @@ namespace RustLanguageExtension
         {
             try
             {
-                var (_, exitCode) = await this.RunCommandAsync("toolchain list");
-                return exitCode == 0;
+                var result = await this.RunCommandAsync("toolchain list");
+                return result.ExitCode == 0;
             }
             catch (Win32Exception)
             {
@@ -46,37 +46,37 @@ namespace RustLanguageExtension
             return RunCommandAsync("update");
         }
 
-        public Task<(string output, int exitCode)> RunAsync(string command, string toolchain)
+        public Task<CommandResult> RunAsync(string command, string toolchain)
         {
             return RunCommandAsync($"run {toolchain} {command}");
         }
 
         public async Task<bool> HasToolchainAsync(string toolchain)
         {
-            var (output, _) = await this.RunCommandAsync("toolchain list");
-            return output.Contains(toolchain);
+            var result = await this.RunCommandAsync("toolchain list");
+            return result.Output.Contains(toolchain);
         }
 
         public async Task<bool> HasComponentAsync(string component, string toolchain)
         {
-            var (output, _) = await this.RunCommandAsync($"component list --toolchain {toolchain}");
-            return Regex.IsMatch(output, $"^{component}.* \\((default|installed)\\)$", RegexOptions.Multiline);
+            var result = await this.RunCommandAsync($"component list --toolchain {toolchain}");
+            return Regex.IsMatch(result.Output, $"^{component}.* \\((default|installed)\\)$", RegexOptions.Multiline);
         }
 
         public async Task<int> InstallToolchainAsync(string toolchain)
         {
-            var (_, exitCode) = await this.RunCommandAsync($"toolchain install {toolchain}");
-            return exitCode;
+            var result = await this.RunCommandAsync($"toolchain install {toolchain}");
+            return result.ExitCode;
         }
 
         public async Task<int> InstallComponentsAsync(string toolchain, params string[] components)
         {
             var componentsString = string.Join(" ", components);
-            var (_, exitCode) = await this.RunCommandAsync($"component add {componentsString} --toolchain {toolchain}");
-            return exitCode;
+            var result = await this.RunCommandAsync($"component add {componentsString} --toolchain {toolchain}");
+            return result.ExitCode;
         }
 
-        private async Task<(string output, int exitCode)> RunCommandAsync(string command)
+        private async Task<CommandResult> RunCommandAsync(string command)
         {
             var startInfo = new ProcessStartInfo()
             {
@@ -90,7 +90,17 @@ namespace RustLanguageExtension
 
             var p = Process.Start(startInfo);
             var output = await p.StandardOutput.ReadToEndAsync();
-            return (output, p.ExitCode);
+            return new CommandResult
+            {
+                Output = output,
+                ExitCode = p.ExitCode
+            };
+        }
+
+        public class CommandResult
+        {
+            public int ExitCode { get; set; }
+            public string Output { get; set; }
         }
     }
 }
