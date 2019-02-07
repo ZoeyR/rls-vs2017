@@ -99,7 +99,7 @@ namespace RustLanguageExtension
             }
 
             // Check for necessary rls components
-            if (!await rustup.HasComponentAsync("rls-preview", toolchain)
+            if (!await rustup.HasComponentAsync("rls", toolchain)
                 || !await rustup.HasComponentAsync("rust-analysis", toolchain)
                 || !await rustup.HasComponentAsync("rust-src", toolchain))
             {
