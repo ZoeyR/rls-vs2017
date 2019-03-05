@@ -5,8 +5,6 @@
         <BaseOutputPath>$(RepoBinPath)$(MSBuildProjectName)</BaseOutputPath>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-        <NoWarn>$(NoWarn);SA1600;CS1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.125" PrivateAssets="all" />

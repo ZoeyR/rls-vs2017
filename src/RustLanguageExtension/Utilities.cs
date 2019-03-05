@@ -12,9 +12,19 @@ namespace RustLanguageExtension
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.Shell;
 
+    /// <summary>
+    /// General utility class for the extension.
+    /// </summary>
     internal class Utilities
     {
-        public static async Task<bool> WaitForSingleButtonInfoBarAsync(VsUtilities.InfoBar infoBar)
+        /// <summary>
+        /// Displays an info bar with one button and waits until the user closes it or clicks the button.
+        /// </summary>
+        /// <param name="infoBar">The infobar to display.</param>
+        /// <param name="serviceProvider">The async service provider.</param>
+        /// <returns>A task that completes when the info bar has been closed or the button selected.
+        /// The task completes with true if the button was pressed or false if the info bar was closed.</returns>
+        public static async Task<bool> WaitForSingleButtonInfoBarAsync(VsUtilities.InfoBar infoBar, IAsyncServiceProvider serviceProvider)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             if (infoBar.ActionItems.Count != 1)
@@ -37,7 +47,7 @@ namespace RustLanguageExtension
                 completionSource.TrySetResult(false);
             };
 
-            await VsUtilities.ShowInfoBarAsync(infoBar);
+            await VsUtilities.ShowInfoBarAsync(infoBar, serviceProvider);
             return await completionSource.Task;
         }
     }

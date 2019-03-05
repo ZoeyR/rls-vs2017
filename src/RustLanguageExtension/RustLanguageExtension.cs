@@ -21,41 +21,59 @@ namespace RustLanguageExtension
     using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
     using Task = System.Threading.Tasks.Task;
 
+    /// <summary>
+    /// Primary class for setting up the connection from VS to the Rust Language Server.
+    /// </summary>
     [Export(typeof(ILanguageClient))]
     [ContentType("rust")]
     public class RustLanguageExtension : ILanguageClient
     {
         private readonly IVsFolderWorkspaceService workspaceService;
         private readonly IAsyncServiceProvider serviceProvider;
+        private readonly OptionsModel optionsModel;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RustLanguageExtension"/> class.
+        /// </summary>
+        /// <param name="workspaceService">The Open Folder workspace service.</param>
+        /// <param name="serviceProvider">The async service provider.</param>
+        /// <param name="optionsModel">Model containing the options for this extension.</param>
         [ImportingConstructor]
-        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService, [Import(typeof(SAsyncServiceProvider))] IAsyncServiceProvider serviceProvider)
+        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService, [Import(typeof(SAsyncServiceProvider))] IAsyncServiceProvider serviceProvider, [Import] OptionsModel optionsModel)
         {
             this.workspaceService = workspaceService;
             this.serviceProvider = serviceProvider;
+            this.optionsModel = optionsModel;
         }
 
+        /// <inheritdoc/>
         public event AsyncEventHandler<EventArgs> StartAsync;
 
+        /// <inheritdoc/>
         public event AsyncEventHandler<EventArgs> StopAsync
         {
             add { }
             remove { }
         }
 
+        /// <inheritdoc/>
         public string Name => "Rust Language Extension";
 
+        /// <inheritdoc/>
         public IEnumerable<string> ConfigurationSections => null;
 
+        /// <inheritdoc/>
         public object InitializationOptions => null;
 
+        /// <inheritdoc/>
         public IEnumerable<string> FilesToWatch => null;
 
+        /// <inheritdoc/>
         public async Task<Connection> ActivateAsync(CancellationToken token)
         {
-            var path = OptionsModel.RustupPath == string.Empty ? "rustup" : OptionsModel.RustupPath;
+            var path = this.optionsModel.RustupPath == string.Empty ? "rustup" : this.optionsModel.RustupPath;
             var rustup = new Rustup(path);
-            var toolchain = OptionsModel.Toolchain;
+            var toolchain = this.optionsModel.Toolchain;
             var env = await this.MakeEnvironmentAsync(rustup, toolchain);
 
             var directoryPath = this.workspaceService.CurrentWorkspace?.Location ?? string.Empty;
@@ -79,21 +97,22 @@ namespace RustLanguageExtension
             return new Connection(p.StandardOutput.BaseStream, p.StandardInput.BaseStream);
         }
 
-        public async System.Threading.Tasks.Task OnLoadedAsync()
+        /// <inheritdoc/>
+        public async Task OnLoadedAsync()
         {
-            var rustup = new Rustup(OptionsModel.RustupPath);
+            var rustup = new Rustup(this.optionsModel.RustupPath);
             if (!await rustup.IsInstalledAsync())
             {
                 var infoBar = new VsUtilities.InfoBar("could not start the rls: rustup is not installed or not on the path");
-                await VsUtilities.ShowInfoBarAsync(infoBar);
+                await VsUtilities.ShowInfoBarAsync(infoBar, this.serviceProvider);
                 return;
             }
 
-            var toolchain = OptionsModel.Toolchain;
+            var toolchain = this.optionsModel.Toolchain;
             if (!await rustup.HasToolchainAsync(toolchain))
             {
                 var infoBar = new VsUtilities.InfoBar($"configured toolchain {toolchain} is not installed", new VsUtilities.InfoBarButton("Install"));
-                if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+                if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar, this.serviceProvider))
                 {
                     var task = rustup.InstallToolchainAsync(toolchain);
                     await VsUtilities.CreateTaskAsync($"Installing {toolchain}", this.serviceProvider, task);
@@ -116,7 +135,7 @@ namespace RustLanguageExtension
                 if (!await this.InstallComponentsAsync(rustup, toolchain, "rls-preview", "rust-analysis", "rust-src"))
                 {
                     var infoBar = new VsUtilities.InfoBar("could not install one of the required rls components");
-                    await VsUtilities.ShowInfoBarAsync(infoBar);
+                    await VsUtilities.ShowInfoBarAsync(infoBar, this.serviceProvider);
                     return;
                 }
             }
@@ -127,11 +146,13 @@ namespace RustLanguageExtension
             }
         }
 
+        /// <inheritdoc/>
         public Task OnServerInitializedAsync()
         {
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public Task OnServerInitializeFailedAsync(Exception e)
         {
             return Task.CompletedTask;
@@ -149,7 +170,7 @@ namespace RustLanguageExtension
                 infoBar = new VsUtilities.InfoBar("required components are not installed", new VsUtilities.InfoBarButton("Install"));
             }
 
-            if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar))
+            if (await Utilities.WaitForSingleButtonInfoBarAsync(infoBar, this.serviceProvider))
             {
                 var task = rustup.InstallComponentsAsync(toolchain, components);
                 await VsUtilities.CreateTaskAsync($"Installing components", this.serviceProvider, task);

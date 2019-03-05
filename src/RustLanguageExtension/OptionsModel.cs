@@ -5,11 +5,19 @@
 
 namespace RustLanguageExtension
 {
+    using System;
+    using System.ComponentModel.Composition;
     using Microsoft.VisualStudio.Settings;
     using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
     using Microsoft.VisualStudio.Shell.Settings;
+    using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
 
-    internal class OptionsModel
+    /// <summary>
+    /// Data model for Rust extension options.
+    /// </summary>
+    [Export]
+    public class OptionsModel
     {
         private const string SettingsCollection = "RustLanguageExtension";
 
@@ -22,13 +30,28 @@ namespace RustLanguageExtension
         private static string toolchain;
         private static string rustupPath;
 
-        public static string Toolchain
+        private readonly IServiceProvider syncServiceProvider;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionsModel"/> class.
+        /// </summary>
+        /// <param name="syncServiceProvider">VS service provider.</param>
+        [ImportingConstructor]
+        public OptionsModel([Import(typeof(SVsServiceProvider))] IServiceProvider syncServiceProvider)
+        {
+            this.syncServiceProvider = syncServiceProvider;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the default toolchain to use for the project.
+        /// </summary>
+        public string Toolchain
         {
             get
             {
                 if (toolchain == null)
                 {
-                    LoadData();
+                    this.LoadData();
                 }
 
                 return toolchain;
@@ -40,13 +63,16 @@ namespace RustLanguageExtension
             }
         }
 
-        public static string RustupPath
+        /// <summary>
+        /// Gets or sets the path to the rustup binary.
+        /// </summary>
+        public string RustupPath
         {
             get
             {
                 if (rustupPath == null)
                 {
-                    LoadData();
+                    this.LoadData();
                 }
 
                 return rustupPath;
@@ -58,11 +84,12 @@ namespace RustLanguageExtension
             }
         }
 
-        public static void LoadData()
+        /// <summary>
+        /// Loads data for the model from the VS settings store.
+        /// </summary>
+        public void LoadData()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
+            var settingsManager = new ShellSettingsManager(this.syncServiceProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 
@@ -70,11 +97,12 @@ namespace RustLanguageExtension
             rustupPath = userSettingsStore.GetString(SettingsCollection, RustupPathProperty);
         }
 
-        public static void SaveData()
+        /// <summary>
+        /// Saves model data to the VS settings store.
+        /// </summary>
+        public void SaveData()
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
-            var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
+            var settingsManager = new ShellSettingsManager(this.syncServiceProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 
