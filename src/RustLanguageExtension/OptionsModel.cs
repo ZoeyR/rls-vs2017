@@ -1,15 +1,23 @@
-﻿using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="OptionsModel.cs" company="Daniel Griffen">
+// Copyright (c) Daniel Griffen. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace RustLanguageExtension
 {
-    internal class OptionsModel
+    using System;
+    using System.ComponentModel.Composition;
+    using Microsoft.VisualStudio.Settings;
+    using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
+    using Microsoft.VisualStudio.Shell.Settings;
+    using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
+
+    /// <summary>
+    /// Data model for Rust extension options.
+    /// </summary>
+    [Export]
+    public class OptionsModel
     {
         private const string SettingsCollection = "RustLanguageExtension";
 
@@ -20,44 +28,68 @@ namespace RustLanguageExtension
         private const string RustupPathProperty = "RustupPath";
 
         private static string toolchain;
-        public static string Toolchain
+        private static string rustupPath;
+
+        private readonly IServiceProvider syncServiceProvider;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionsModel"/> class.
+        /// </summary>
+        /// <param name="syncServiceProvider">VS service provider.</param>
+        [ImportingConstructor]
+        public OptionsModel([Import(typeof(SVsServiceProvider))] IServiceProvider syncServiceProvider)
+        {
+            this.syncServiceProvider = syncServiceProvider;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the default toolchain to use for the project.
+        /// </summary>
+        public string Toolchain
         {
             get
             {
                 if (toolchain == null)
                 {
-                    LoadData();
+                    this.LoadData();
                 }
 
                 return toolchain;
             }
+
             set
             {
                 toolchain = value;
             }
         }
 
-        private static string rustupPath;
-        public static string RustupPath
+        /// <summary>
+        /// Gets or sets the path to the rustup binary.
+        /// </summary>
+        public string RustupPath
         {
             get
             {
                 if (rustupPath == null)
                 {
-                    LoadData();
+                    this.LoadData();
                 }
 
                 return rustupPath;
             }
+
             set
             {
                 rustupPath = value;
             }
         }
 
-        public static void LoadData()
+        /// <summary>
+        /// Loads data for the model from the VS settings store.
+        /// </summary>
+        public void LoadData()
         {
-            var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
+            var settingsManager = new ShellSettingsManager(this.syncServiceProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 
@@ -65,9 +97,12 @@ namespace RustLanguageExtension
             rustupPath = userSettingsStore.GetString(SettingsCollection, RustupPathProperty);
         }
 
-        public static void SaveData()
+        /// <summary>
+        /// Saves model data to the VS settings store.
+        /// </summary>
+        public void SaveData()
         {
-            var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
+            var settingsManager = new ShellSettingsManager(this.syncServiceProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
 

@@ -1,0 +1,20 @@
+<Project>
+    <PropertyGroup>
+        <RepoBinPath>$(MSBuildThisFileDirectory)..\bin\</RepoBinPath>
+        <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(RepoBinPath)$(MSBuildProjectName)</BaseOutputPath>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.125" PrivateAssets="all" />
+        <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json">
+            <Visible>true</Visible>
+            <Link>stylecop.json</Link>
+        </AdditionalFiles>
+    </ItemGroup>
+</Project>
