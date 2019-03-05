@@ -1,14 +1,19 @@
-﻿using Microsoft.VisualStudio.LanguageServer.Client;
-using Microsoft.VisualStudio.Utilities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="RustContentDefinition.cs" company="Daniel Griffen">
+// Copyright (c) Daniel Griffen. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace RustLanguageExtension
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.LanguageServer.Client;
+    using Microsoft.VisualStudio.Utilities;
+
     public class RustContentDefinition
     {
         [Export]

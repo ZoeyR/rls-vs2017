@@ -1,24 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿// <copyright file="Rustup.cs" company="Daniel Griffen">
+// Copyright (c) Daniel Griffen. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace RustLanguageExtension
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+
     internal class Rustup
     {
         private string path;
+
         public Rustup(string path)
         {
-            if (path == String.Empty)
+            if (path == string.Empty)
             {
                 this.path = "rustup";
-            } else
+            }
+            else
             {
                 this.path = path;
             }
@@ -43,12 +50,12 @@ namespace RustLanguageExtension
 
         public Task UpdateAsync()
         {
-            return RunCommandAsync("update");
+            return this.RunCommandAsync("update");
         }
 
         public Task<CommandResult> RunAsync(string command, string toolchain)
         {
-            return RunCommandAsync($"run {toolchain} {command}");
+            return this.RunCommandAsync($"run {toolchain} {command}");
         }
 
         public async Task<bool> HasToolchainAsync(string toolchain)
@@ -100,6 +107,7 @@ namespace RustLanguageExtension
         public class CommandResult
         {
             public int ExitCode { get; set; }
+
             public string Output { get; set; }
         }
     }

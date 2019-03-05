@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="OptionsModel.cs" company="Daniel Griffen">
+// Copyright (c) Daniel Griffen. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+// </copyright>
 
 namespace RustLanguageExtension
 {
+    using Microsoft.VisualStudio.Settings;
+    using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Settings;
+
     internal class OptionsModel
     {
         private const string SettingsCollection = "RustLanguageExtension";
@@ -20,6 +20,8 @@ namespace RustLanguageExtension
         private const string RustupPathProperty = "RustupPath";
 
         private static string toolchain;
+        private static string rustupPath;
+
         public static string Toolchain
         {
             get
@@ -31,13 +33,13 @@ namespace RustLanguageExtension
 
                 return toolchain;
             }
+
             set
             {
                 toolchain = value;
             }
         }
 
-        private static string rustupPath;
         public static string RustupPath
         {
             get
@@ -49,6 +51,7 @@ namespace RustLanguageExtension
 
                 return rustupPath;
             }
+
             set
             {
                 rustupPath = value;
@@ -57,6 +60,8 @@ namespace RustLanguageExtension
 
         public static void LoadData()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
@@ -67,6 +72,8 @@ namespace RustLanguageExtension
 
         public static void SaveData()
         {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
             var settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
             var userSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
             EnsureSettingsStore(userSettingsStore);
