@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "RustLanguageExtension": {
+      "commandName": "Executable",
+      "executablePath": "$(DevEnvDir)\\devenv.exe",
+      "commandLineArgs": "/rootsuffix Exp"
+    }
+  }
+}
