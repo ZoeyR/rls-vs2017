@@ -20,6 +20,7 @@
     <StartAction>Program</StartAction>
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
+    <UseCodebase>true</UseCodebase>
   </PropertyGroup>
 
   <ItemGroup>
