@@ -6,7 +6,7 @@
 namespace RustLanguageExtension
 {
     using System;
-    using System.ComponentModel.Composition;
+    using System.Composition;
     using Microsoft.VisualStudio.Settings;
     using Microsoft.VisualStudio.Shell;
     using Microsoft.VisualStudio.Shell.Interop;
@@ -27,8 +27,8 @@ namespace RustLanguageExtension
         private const string RustupPathDefault = "";
         private const string RustupPathProperty = "RustupPath";
 
-        private static string toolchain;
-        private static string rustupPath;
+        private static string toolchain = ToolchainDefault;
+        private static string rustupPath = RustupPathDefault;
 
         private readonly IServiceProvider syncServiceProvider;
 
@@ -37,7 +37,7 @@ namespace RustLanguageExtension
         /// </summary>
         /// <param name="syncServiceProvider">VS service provider.</param>
         [ImportingConstructor]
-        public OptionsModel([Import(typeof(SVsServiceProvider))] IServiceProvider syncServiceProvider)
+        public OptionsModel([Import("Microsoft.VisualStudio.Shell.SVsServiceProvider")] IServiceProvider syncServiceProvider)
         {
             this.syncServiceProvider = syncServiceProvider;
         }

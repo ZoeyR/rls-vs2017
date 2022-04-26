@@ -29,7 +29,7 @@ namespace RustLanguageExtension
         public delegate void InfoBarEventHandler(object source, InfoBarEventArgs e);
 
         /// <summary>
-        /// Create a task in the VS task status center
+        /// Create a task in the VS task status center.
         /// </summary>
         /// <param name="title">The name of the task.</param>
         /// <param name="serviceProvider">VS async service provider.</param>

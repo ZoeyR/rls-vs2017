@@ -143,7 +143,7 @@ namespace RustLanguageExtension
             return new CommandResult
             {
                 Output = output,
-                ExitCode = p.ExitCode
+                ExitCode = p.ExitCode,
             };
         }
 
