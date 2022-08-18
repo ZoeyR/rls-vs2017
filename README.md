@@ -1,3 +1,7 @@
+# DEPRECATED
+
+Please use [VS-RustAnalyzer](https://github.com/cchharris/VS-RustAnalyzer) instead.
+
 # Rust support for Visual Studio 2017 Preview
 
 [![Build status](https://ci.appveyor.com/api/projects/status/d2lxlincwninhsng?svg=true)](https://ci.appveyor.com/project/dgriffen/rls-vs2017)
