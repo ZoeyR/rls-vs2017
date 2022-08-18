@@ -7,7 +7,7 @@ namespace RustLanguageExtension
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.Composition;
+    using System.Composition;
     using System.Diagnostics;
     using System.IO;
     using System.Threading;
@@ -17,6 +17,7 @@ namespace RustLanguageExtension
     using Microsoft.VisualStudio.Shell.Interop;
     using Microsoft.VisualStudio.Threading;
     using Microsoft.VisualStudio.Utilities;
+    using Microsoft.VisualStudio.Workspace;
     using Microsoft.VisualStudio.Workspace.VSIntegration.Contracts;
     using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
     using Task = System.Threading.Tasks.Task;
@@ -39,7 +40,7 @@ namespace RustLanguageExtension
         /// <param name="serviceProvider">The async service provider.</param>
         /// <param name="optionsModel">Model containing the options for this extension.</param>
         [ImportingConstructor]
-        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService, [Import(typeof(SAsyncServiceProvider))] IAsyncServiceProvider serviceProvider, [Import] OptionsModel optionsModel)
+        public RustLanguageExtension([Import] IVsFolderWorkspaceService workspaceService, [Import("Microsoft.VisualStudio.Shell.Interop.SAsyncServiceProvider")] IAsyncServiceProvider serviceProvider, [Import] OptionsModel optionsModel)
         {
             this.workspaceService = workspaceService;
             this.serviceProvider = serviceProvider;
@@ -47,10 +48,10 @@ namespace RustLanguageExtension
         }
 
         /// <inheritdoc/>
-        public event AsyncEventHandler<EventArgs> StartAsync;
+        public event AsyncEventHandler<EventArgs?> StartAsync;
 
         /// <inheritdoc/>
-        public event AsyncEventHandler<EventArgs> StopAsync
+        public event AsyncEventHandler<EventArgs?> StopAsync
         {
             add { }
             remove { }
@@ -69,7 +70,7 @@ namespace RustLanguageExtension
         public IEnumerable<string> FilesToWatch => null;
 
         /// <inheritdoc/>
-        public async Task<Connection> ActivateAsync(CancellationToken token)
+        public async Task<Connection?> ActivateAsync(CancellationToken token)
         {
             var path = this.optionsModel.RustupPath == string.Empty ? "rustup" : this.optionsModel.RustupPath;
             var rustup = new Rustup(path);
@@ -200,5 +201,14 @@ namespace RustLanguageExtension
             var result = await rustup.RunAsync("rustc --print sysroot", toolchain);
             return result.Output.Replace("\n", string.Empty).Replace("\r", string.Empty);
         }
+
+        public async Task<InitializationFailureContext?> OnServerInitializeFailedAsync(ILanguageClientInitializationInfo initializationState)
+        {
+            var result = new InitializationFailureContext();
+            result.FailureMessage = string.Format(initializationState.ToString());
+            return result;
+        }
+
+        public bool ShowNotificationOnInitializeFailed => true;
     }
 }

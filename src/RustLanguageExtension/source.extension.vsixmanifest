@@ -3,21 +3,22 @@
     <Metadata>
         <Identity Id="RustLanguageExtension.5c010d5e-68dd-4c38-a7ca-c2ac3a8103fd" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="Daniel Griffen" />
         <DisplayName>Rust</DisplayName>
-        <Description xml:space="preserve">Rust Extension for VS2017 with Language Server Support</Description>
-        <ReleaseNotes>https://github.com/dgriffen/rls-vs2017/blob/master/CHANGELOG.md</ReleaseNotes>
+        <Description xml:space="preserve">Rust Extension for VS2022 with Language Server Support</Description>
+        <ReleaseNotes>https://github.com/inequation/rls-vs2022/blob/master/CHANGELOG.md</ReleaseNotes>
         <Icon>rust-logo-256x256.png</Icon>
     </Metadata>
-    <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0.27825.0, 17.0)" />
+	<Installation>
+      <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+        <ProductArchitecture>amd64</ProductArchitecture>
+      </InstallationTarget>
     </Installation>
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
     </Dependencies>
     <Assets>
-        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+		<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     </Assets>
     <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,17.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0, 18.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>
 </PackageManifest>
